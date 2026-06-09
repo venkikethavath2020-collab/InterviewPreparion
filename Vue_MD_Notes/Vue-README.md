@@ -31,12 +31,17 @@
 | 23 | [Interview Master](Vue-Module-23-InterviewMaster.md) | 100 core + reactivity/composition/pinia/perf/scenario/debug Qs |
 | 24 | [Real Scenarios](Vue-Module-24-RealScenarios.md) | Why re-render / watch ×N / computed stale / leaks — debugging |
 | 25 | [Revision Sheets](Vue-Module-25-RevisionSheets.md) | 1-day/3-hr/30-min + reactivity/composition/pinia/router/perf cheat sheets |
+| 26 | [Builtins & APIs](Vue-Module-26-BuiltinsAndAPIs.md) | Built-in components, global/app APIs, utilities |
+| 27 | [Live-Coding Skeletons](Vue-Module-27-LiveCodingSkeletons.md) | **Build-from-scratch mental model**: component skeleton order, ref/reactive/computed/watch decision table, fill-in templates for display/dynamic-form/CRUD/fetch/v-model |
+| ✦ | [TypeScript + Vue Mental Models](TypeScript-Vue-MentalModels.md) | **WHY-not-syntax deep dive**: TS fundamentals (types/generics/utility types) → functions/objects/arrays (map/filter/reduce diagrams) → Vue reactivity (ref/reactive/computed/watch tables) → lifecycle timeline → 8-layer component build order. Per-concept: why/when/when-not/mistakes/TS typing/memory tricks + collapsed-solution exercises |
 
 ## 🎯 How to Use
 - **Learning:** Modules 1→25 in order.
 - **1 week out:** prioritize 2, 3, 8, 9, 11, 12, 24 (highest-yield internals + debugging).
 - **1 day out:** Module 25 (1-day notes) + Module 23 (Top 100).
 - **30 min out:** Module 25 → 30-minute revision + cheat sheets.
+- **Live-coding round ("build a component from scratch"):** Module 27 — memorize the skeleton order + decision table, then drill the task templates.
+- **TypeScript-heavy / "no syntax memorization" prep:** [TypeScript + Vue Mental Models](TypeScript-Vue-MentalModels.md) — build the mental models (types → functions → objects → arrays → reactivity → lifecycle → component build order) and do the exercises from a blank file.
 
 ## 🔑 The Golden Rules
 1. Reactivity = track on read, trigger on write (Proxy + targetMap).
