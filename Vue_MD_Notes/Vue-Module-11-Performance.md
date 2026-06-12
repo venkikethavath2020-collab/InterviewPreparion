@@ -102,10 +102,78 @@ old: [A B C D E]   new: [A C D B E]
 ---
 
 ## INTERVIEW QUESTIONS
-**🟢:** Why are keys important? · v-if vs v-show for perf? · computed vs method (caching)? · What is lazy loading?
-**🟡:** How does Vue's diff minimize DOM ops (LIS)? · What are patch flags / static hoisting? · v-once vs v-memo? · When shallowRef/markRaw?
-**🔴:** Explain block tree & how it speeds diffing. · How does Vue batch updates? · Optimize a 10k-row table (virtual scroll + v-memo + shallowRef). · Tree shaking & bundle analysis.
-**🧩:** Component re-renders too often — diagnose (DevTools, renderTriggered) (see Module 24). · Big initial load — code split + lazy. · Laggy huge list — virtualize + memo. · Streaming data janks UI — shallowRef + throttle.
+
+### 🟢 Basic
+
+**Q1. Why are keys important in Vue lists?**  
+Answer: Keys give Vue a stable identity for each item, so it can reuse and move DOM nodes correctly.  
+Interview line: Use unique, stable ids; avoid index keys when lists can reorder, filter, insert, or delete.
+
+**Q2. `v-if` vs `v-show`: which is better for performance?**  
+Answer: `v-if` mounts/unmounts elements, while `v-show` keeps the element mounted and toggles CSS display.  
+Interview line: Use `v-if` for rarely shown content and `v-show` for frequently toggled UI like tabs/dropdowns.
+
+**Q3. Why is `computed` usually better than a method for derived template data?**  
+Answer: `computed` values are cached based on reactive dependencies, while methods run again on every render.  
+Interview line: Use `computed` for expensive or repeated derived values; use methods for actions or non-cached logic.
+
+**Q4. What is lazy loading in Vue?**  
+Answer: Lazy loading delays downloading code until it is actually needed, usually with dynamic imports.  
+Interview line: Use route-level or async component lazy loading to reduce the initial bundle and improve first load.
+
+### 🟡 Intermediate
+
+**Q5. How does Vue's diff algorithm minimize DOM operations?**  
+Answer: Vue compares old and new VNodes, uses keys to match nodes, and computes the LIS to reduce moves in keyed lists.  
+Interview line: Stable keys let Vue keep unchanged nodes in place and move only the minimum required elements.
+
+**Q6. What are patch flags and static hoisting?**  
+Answer: Patch flags tell Vue exactly what part of a node is dynamic, and static hoisting reuses static VNodes across renders.  
+Interview line: These compiler optimizations let Vue skip unnecessary checks and focus diffing only on dynamic content.
+
+**Q7. What is the difference between `v-once` and `v-memo`?**  
+Answer: `v-once` renders a subtree once forever, while `v-memo` skips re-rendering until its dependency array changes.  
+Interview line: Use `v-once` for permanently static content and `v-memo` for large subtrees that change only by specific deps.
+
+**Q8. When should you use `shallowRef`, `shallowReactive`, or `markRaw`?**  
+Answer: Use them when large objects, external libraries, or immutable data should not be deeply reactive.  
+Interview line: They reduce proxy overhead for big datasets, chart instances, maps, editors, and streaming records.
+
+### 🔴 Advanced
+
+**Q9. What is Vue's block tree and how does it speed up rendering?**  
+Answer: A block tracks only dynamic child nodes inside a subtree, so Vue can skip static structure during patching.  
+Interview line: Instead of diffing every node, Vue jumps directly to dynamic nodes collected by the compiler.
+
+**Q10. How does Vue batch updates?**  
+Answer: Vue queues reactive state changes and flushes DOM updates asynchronously on the next tick.  
+Interview line: Multiple state mutations in the same tick produce one render cycle, reducing duplicate DOM work.
+
+**Q11. How would you optimize a 10k-row table in Vue?**  
+Answer: Use virtual scrolling, stable row keys, `v-memo` for rows, computed filtering, and shallow data refs.  
+Interview line: Render only visible rows, avoid deep reactivity on huge data, and throttle expensive user interactions.
+
+**Q12. How do tree shaking and bundle analysis help performance?**  
+Answer: Tree shaking removes unused ESM exports, and bundle analysis shows which dependencies/chunks are large.  
+Interview line: Import only what you need, split heavy features, and inspect bundle reports before optimizing blindly.
+
+### 🧩 Scenario Based
+
+**Q13. A component re-renders too often. How do you diagnose it?**  
+Answer: Use Vue DevTools render timings plus `onRenderTracked` and `onRenderTriggered` to find reactive dependencies.  
+Interview line: Identify what state triggers the render, then narrow props, use computed/memoization, or split components.
+
+**Q14. The app has a big initial load. What would you do?**  
+Answer: Add route-level code splitting, lazy-load heavy components, analyze the bundle, and defer non-critical work.  
+Interview line: Optimize the first route first; ship less JavaScript before tuning smaller runtime details.
+
+**Q15. A huge list feels laggy. How do you fix it?**  
+Answer: Use virtual scrolling, stable keys, memoized rows, pagination/windowing, and avoid inline expensive calculations.  
+Interview line: The biggest win is rendering fewer DOM nodes, then preventing unnecessary row updates.
+
+**Q16. Streaming data causes UI jank. How do you optimize it?**  
+Answer: Store large incoming data in `shallowRef`, batch updates, throttle rendering, and update only visible UI regions.  
+Interview line: Control update frequency and avoid deep reactivity so real-time data does not overwhelm the main thread.
 
 ## ⚡ REVISION
 - Fine-grained reactivity + compiler (patch flags, static hoist, block tree) + batched async updates.
