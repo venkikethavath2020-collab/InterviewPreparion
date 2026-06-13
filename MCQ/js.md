@@ -894,6 +894,396 @@ Example: Moving `console.log(b)` below `let b = 10` fixes it.
 
     Example: `!!"false"` → `true`, `!!""` → `false`.
 
+
+# JavaScript + Vue — Interview-Ready Notes
+
+> **Use as a drill, not an article.** Cover the answer → say it out loud → check.
+> You've already gotten 4 things wrong in prep by *reading* instead of *recalling*. Don't repeat it.
+>
+> ⚠️ = the follow-up the interviewer springs after the first answer.
+> 🎯 = the one-liner to actually say in the room.
+
 ---
 
-If you want, I can also give you a **Senior Frontend Interview MCQ Sheet (Top 100 JS tricky questions companies ask)** that is **much harder than this and often asked in FAANG / product company interviews.**
+## 1. Execution Context
+
+**What it is:** The environment where JS code runs. Two phases:
+
+1. **Creation phase** — JS scans the code, sets up memory: `var` → `undefined`, functions → fully stored, `let`/`const` → reserved but unusable (TDZ).
+2. **Execution phase** — runs line by line, assigns real values.
+
+There's a **Global** context (created first) and a new **Function** context every time a function is called. They stack on the **Call Stack** (last in, first out).
+
+🎯 *"Execution context is the environment code runs in. JS first sets up memory in a creation phase, then runs the code in an execution phase."*
+
+⚠️ **"What's on the call stack?"** → Each function call pushes a new context; when it returns, it pops off. Stack overflow = too many calls (usually bad recursion).
+
+---
+
+## 2. Hoisting
+
+**What it is:** During the creation phase, declarations are "moved to the top." But they behave differently:
+
+```js
+console.log(a);   // undefined  ← var is hoisted AND initialized to undefined
+var a = 5;
+
+console.log(b);   // ReferenceError ← let is hoisted but NOT initialized (TDZ)
+let b = 5;
+
+foo();            // works ← function declarations fully hoisted
+function foo() {}
+
+bar();            // ERROR ← function EXPRESSIONS are not
+var bar = function () {};
+```
+
+**TDZ (Temporal Dead Zone)** = the gap between a `let`/`const` being hoisted and being assigned. Touching it there throws.
+
+🎯 *"`var` hoists as undefined, `let`/`const` hoist but stay in the temporal dead zone until assigned, function declarations hoist fully."*
+
+⚠️ **"Why TDZ exist?"** → To catch bugs — using a variable before you define it is almost always a mistake, so `let`/`const` make it an error instead of silently giving `undefined`.
+
+---
+
+## 3. Scope & Scope Chain
+
+**Scope** = where a variable is accessible.
+- **Global** — everywhere.
+- **Function** — inside that function only.
+- **Block** (`{}`) — `let`/`const` only; `var` ignores blocks.
+
+**Scope chain** = when JS can't find a variable locally, it looks *outward* to the parent scope, then its parent, up to global. One direction only — outer scopes can't see inner.
+
+```js
+const a = 1;
+function outer() {
+  const b = 2;
+  function inner() {
+    console.log(a, b);  // finds b in outer, a in global — walks the chain
+  }
+  inner();
+}
+```
+
+🎯 *"If a variable isn't found locally, JS walks up the scope chain to outer scopes until it finds it or hits global."*
+
+---
+
+## 4. Closures
+
+**What it is:** An inner function that **remembers variables from its outer scope even after the outer function has returned.**
+
+```js
+function counter() {
+  let count = 0;
+  return function () {
+    count++;
+    return count;
+  };
+}
+
+const c = counter();   // run outer ONCE, keep the inner function
+c(); // 1
+c(); // 2  ← count stayed alive — that's the closure
+```
+
+⚠️ **THE trap:** `counter()` returns a **function**, not a number. And `counter(); counter();` gives `1, 1` (fresh count each time). Only `const c = counter(); c(); c();` climbs (`1, 2`) — because you **reuse** the same closure.
+
+🎯 *"A closure lets an inner function keep access to its outer scope's variables after the outer function finishes. The variable stays alive as long as the closure references it."*
+
+**Real uses:** private variables, counters, function factories, `useState`-style hooks.
+
+---
+
+## 5. `this`
+
+**The rule: `this` depends on HOW a function is CALLED, not where it's defined.**
+
+```js
+obj.method();        // this = obj (the thing left of the dot)
+standalone();        // this = undefined (strict) / window (non-strict)
+new Foo();           // this = the new object
+arrow();             // this = inherited from where it was DEFINED
+```
+
+**Arrow functions are the exception** — they don't get their own `this`, they grab it from the surrounding scope. That's *why* arrows are used in callbacks (to keep the outer `this`).
+
+```js
+const obj = {
+  name: "Sam",
+  greetLater() {
+    setTimeout(() => console.log(this.name), 100);  // arrow → this = obj ✅
+    // setTimeout(function(){ console.log(this.name) }) → this = undefined ❌
+  }
+};
+```
+
+🎯 *"`this` is determined by how a function is called. Arrow functions are the exception — they inherit `this` from where they're defined."*
+
+⚠️ **"Left of the dot"** is the quick heuristic for normal calls: `a.b.c()` → `this` is `a.b`.
+
+---
+
+## 6. Call, Apply, Bind
+
+All three set `this` manually. Difference is *how they pass arguments* and *when they run*:
+
+```js
+function greet(greeting) { return `${greeting}, ${this.name}`; }
+const user = { name: "Sam" };
+
+greet.call(user, "Hi");      // runs NOW, args comma-separated
+greet.apply(user, ["Hi"]);   // runs NOW, args as an ARRAY
+const bound = greet.bind(user, "Hi");  // returns a NEW function, run later
+bound();                     // "Hi, Sam"
+```
+
+🎯 *"Call and apply invoke immediately — call takes comma args, apply takes an array. Bind returns a new function with `this` locked, to call later."*
+
+Memory trick: **C**all = **C**omma, **A**pply = **A**rray, **B**ind = **B**ound for later.
+
+---
+
+## 7. Mutation vs Reassignment
+
+**Mutation** = changing the contents of an object/array. **Reassignment** = pointing the variable at something new.
+
+```js
+const arr = [1, 2];
+arr.push(3);    // ✅ mutation — same array, const allows it
+arr = [9];      // ❌ reassignment — const forbids it
+```
+
+Why `const arr` allows `push`: the variable holds a **reference**, not the values. `const` locks the reference, not the contents.
+
+```js
+const a = [1, 2];
+const b = a;     // b copies the REFERENCE — same array
+b.push(3);
+a;               // [1, 2, 3] — both point to one array
+
+let c = a;
+c = [9, 9];      // reassignment — c now points elsewhere
+a;               // [1, 2, 3] — untouched
+```
+
+🎯 *"`const` prevents reassigning the variable, not mutating the value. Objects and arrays hold a reference, so their contents stay editable."*
+
+⚠️ Mutation **shares** (same reference), reassignment **splits** (new reference). This is the root of the next topic AND Vue reactivity.
+
+---
+
+## 8. Deep vs Shallow Copy
+
+**Shallow copy** = copies the top level; nested objects are still **shared references**.
+
+```js
+const obj = { name: "Sam", address: { city: "NYC" } };
+
+const shallow = { ...obj };           // spread = shallow
+shallow.name = "Alex";                // ✅ independent (top level)
+shallow.address.city = "LA";          // ❌ ALSO changes obj.address.city — shared!
+```
+
+**Deep copy** = fully independent, nested included:
+
+```js
+const deep = structuredClone(obj);    // modern, built-in ✅
+// or JSON.parse(JSON.stringify(obj)) — works but loses functions/dates
+```
+
+🎯 *"Spread and Object.assign are shallow — nested objects stay shared. For full independence use structuredClone."*
+
+⚠️ **"Why does my copy still affect the original?"** → You did a shallow copy and mutated a *nested* object, which both still share.
+
+---
+
+## 9. Prototype Chain
+
+**What it is:** Every object has a hidden link (`__proto__`) to another object — its prototype. When you access a property, JS checks the object, then its prototype, then *its* prototype, up to `null`. (Same outward-walk idea as the scope chain.)
+
+```js
+const arr = [1, 2];
+arr.push(3);   // arr has no "push" itself — found on Array.prototype
+```
+
+This is how inheritance works in JS — objects borrow methods from their prototype instead of each having their own copy.
+
+🎯 *"When you access a property, JS walks up the prototype chain until it finds it or hits null. It's how JS does inheritance and method sharing."*
+
+⚠️ Class syntax (`class`, `extends`) is just nicer syntax over this prototype mechanism — not a different system.
+
+---
+
+## 10. Event Loop (async core — asked constantly)
+
+JS is **single-threaded** — one thing at a time. The event loop is how it handles async without blocking.
+
+**The pieces:**
+- **Call stack** — runs your code.
+- **Web APIs** — handle timers, fetch, events (outside JS).
+- **Microtask queue** — Promises (`.then`, `await`). **Higher priority.**
+- **Macrotask queue** — `setTimeout`, `setInterval`. Lower priority.
+
+**Rule: the stack must be empty, then ALL microtasks run, then ONE macrotask. Repeat.**
+
+```js
+console.log("1");
+setTimeout(() => console.log("2"), 0);   // macrotask
+Promise.resolve().then(() => console.log("3"));  // microtask
+console.log("4");
+
+// Output: 1, 4, 3, 2
+// sync first (1,4) → microtask (3) → macrotask (2)
+```
+
+🎯 *"JS is single-threaded. The event loop runs sync code, then drains all microtasks (Promises), then one macrotask (setTimeout). Promises always beat setTimeout."*
+
+⚠️ **"setTimeout(fn, 0) — does it run immediately?"** → No. It waits for the stack to clear AND all microtasks to finish first. `0` is a minimum, not a guarantee.
+
+---
+
+## 11. Promises
+
+**What it is:** An object representing a value that's **not ready yet**. Three states: **pending → fulfilled** or **rejected**. Once settled, it can't change.
+
+```js
+const p = fetch("/api/user")
+  .then(res => res.json())   // runs on success
+  .catch(err => console.log(err))  // runs on failure
+  .finally(() => console.log("done"));  // always runs
+```
+
+Solves **callback hell** — chaining `.then` instead of nesting callbacks.
+
+**Combinators worth knowing:**
+- `Promise.all([...])` — waits for ALL, fails if any one fails.
+- `Promise.allSettled([...])` — waits for all, never rejects (gives status of each).
+- `Promise.race([...])` — first to settle wins.
+
+🎯 *"A Promise represents a future value. It's pending, then either fulfilled or rejected, and once settled it's locked."*
+
+---
+
+## 12. Async / Await
+
+**What it is:** Syntax sugar over Promises — makes async code *read* like sync code.
+
+```js
+async function getUser() {
+  try {
+    const res = await fetch("/api/user");   // pauses here till it resolves
+    const data = await res.json();
+    return data;
+  } catch (err) {
+    console.log(err);   // handles rejected promises
+  }
+}
+```
+
+- `async` makes a function **always return a Promise**.
+- `await` **pauses** until the Promise resolves — but only inside `async` functions.
+- `try/catch` replaces `.catch`.
+
+🎯 *"Async/await is cleaner syntax over Promises. `await` pauses until the Promise settles, and try/catch handles errors. The function still returns a Promise underneath."*
+
+⚠️ **"Does await block the whole app?"** → No — it only pauses *that* function. Other code keeps running; the event loop isn't frozen.
+
+---
+
+## 13. ES6+ Features (rapid-fire — know one line each)
+
+```js
+let / const          // block scope, no more var
+() => {}             // arrow functions, lexical this
+`hello ${name}`      // template literals
+const { a, b } = obj // destructuring
+const [x, y] = arr   // array destructuring
+...spread / ...rest  // expand / collect
+function f(a = 1){}  // default params
+import / export      // ES modules
+class Foo {}         // class syntax (over prototypes)
+async / await        // async sugar
+obj?.a?.b            // optional chaining (no crash on undefined)
+a ?? b               // nullish coalescing (b only if a is null/undefined)
+```
+
+⚠️ **`??` vs `||`:** `||` falls back on ANY falsy value (`0`, `""`, `false`). `??` falls back **only** on `null`/`undefined`. So `0 ?? 5` → `0`, but `0 || 5` → `5`. Common bug source.
+
+---
+
+## 14. Memory Management (short)
+
+JS handles memory automatically via **garbage collection**. The rule: an object is kept while it's **reachable** (something still references it); when nothing references it, it becomes eligible for cleanup.
+
+**Memory leaks happen when references hang around unintentionally:**
+- Forgotten timers/intervals not cleared.
+- Event listeners not removed.
+- Closures holding large objects longer than needed.
+- Global variables that never get released.
+
+🎯 *"JS auto-frees memory through garbage collection — an object is collected once nothing references it. Leaks come from references you forgot to release, like uncleared intervals or listeners."*
+
+---
+
+## 15. Vue Reactivity Internals (the Vue-specific payoff)
+
+**The core:** Vue 3 uses a **Proxy** to wrap your reactive data. The Proxy intercepts reads and writes:
+- On **read** (get) → Vue **tracks** which effect (component render, computed, watcher) used that property.
+- On **write** (set) → Vue **triggers** those tracked effects to re-run.
+
+That track-on-read, trigger-on-write loop is the whole engine.
+
+```js
+const state = reactive({ count: 0 });
+// reading state.count → Vue records "this render depends on count"
+// state.count++ → Vue re-runs everything that depended on count
+```
+
+**Why `ref` needs `.value`:** Proxies only work on objects. Primitives (number, string) can't be proxied directly, so `ref` wraps the value in an object `{ value: x }` — and `.value` is the property the Proxy can intercept.
+
+⚠️ **Connects to Mutation vs Reassignment (topic 7!):**
+```js
+let state = reactive({ count: 0 });
+state.count++;        // ✅ mutation — Proxy intercepts, reactivity works
+state = reactive({ count: 5 });  // ❌ reassignment — component still holds
+                                 //    the OLD proxy, reactivity lost
+```
+Mutating keeps the same proxy (tracked). Reassigning points your variable at a new object the component isn't watching. **Same reference-vs-reassignment rule from topic 7** — now you see why it matters in Vue.
+
+🎯 *"Vue 3 wraps data in a Proxy that tracks property reads and triggers updates on writes. `ref` needs `.value` because primitives can't be proxied, so they're wrapped in an object."*
+
+---
+
+## The connective tissue (this is what impresses)
+
+Notice the **same idea** repeats across topics — point this out if you can:
+
+- **Outward-walking lookup:** scope chain (vars) and prototype chain (properties) both walk *outward* until found.
+- **Reference vs reassignment:** explains `const` arrays (7), shallow copy (8), AND why reassigning a `reactive` breaks Vue (15).
+- **Single-threaded + queues:** event loop (10), Promises (11), async/await (12) are one story told three ways.
+
+An interviewer who hears you connect these knows you *understand* JS, not just memorized 15 cards.
+
+---
+
+## Priority for your few days (Vue role)
+
+**Drill these to the point you can WRITE them blank:**
+1. Closures — the `counter()` reuse trap
+2. `this` + arrow exception
+3. Event loop output order (1, 4, 3, 2)
+4. Mutation vs reassignment
+5. Vue reactivity (Proxy, why `.value`)
+6. async/await + try/catch
+
+**Know cold but lighter:**
+7. Hoisting + TDZ
+8. Deep vs shallow copy
+9. Call/apply/bind
+10. `??` vs `||`
+
+The rest (scope chain, prototype, memory, execution context, ES6 list) — read-level is fine; they're usually quick mentions, not whiteboard questions.
+
+> Reading this once does nothing. Cover → recall → check. That's the only version that sticks.
