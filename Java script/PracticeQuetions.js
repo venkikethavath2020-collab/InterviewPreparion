@@ -289,14 +289,17 @@ function findMax(arr) {
 
 function movezerostoEnd(arr) {
 
-    let zeros = []
-    let nonZeros = []
+    let j = 0;
 
-    arr.forEach((x) => {
-        x !== 0 ? nonZeros.push(x) : zeros.push(x)
-    })
+    for (let i = 0; i < arr.length; i++) {
+        if (arr[i] !== 0) {
+            [arr[i], arr[j]] = [arr[j], arr[i]]
+            j++
+        }
+    }
 
-    return [...nonZeros, ...zeros]
+    return arr
+
 }
 
 // console.log(movezerostoEnd(zeros))
@@ -320,8 +323,8 @@ function flattenArrayByLevel(arr, level) {
 
 function secondHighest(arr) {
 
-    let first = 0
-    let second = 0
+    let first = -Infinity
+    let second = -Infinity
 
     arr.forEach((x) => {
         if (x > first) {

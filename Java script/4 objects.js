@@ -47,3 +47,11 @@ console.log("Obj3", obj3); // Throws error as this object is sealed
 Object.isFrozen(obj2)  // true
 Object.isSealed(obj3)  // true
 // End of objects.js
+
+// Difference between freeze and seal
+// Freeze makes the object completely immutable, meaning you cannot add, remove, or modify any properties or their values.
+// Seal allows modification of existing property values but prevents adding or removing properties.
+
+console.log("Object.freeze vs Object.seal:");
+console.log("Object.freeze(obj2):", Object.isFrozen(obj2)); // true
+console.log("Object.seal(obj3):", Object.isSealed(obj3));  // true
