@@ -1,7 +1,22 @@
 
 // Definition
-// A closure is created when a function remembers variables from its lexical scope, even after the outer function has finished execution.
+// A closure is created when a function remembers variables from its lexical scope ( ) , even after the outer function has finished execution.
 // Function + Lexical Environment = Closure
+
+// Lexical Scope: The scope created by the placement of variables and functions in the code
+// Example: A function defined inside another function can access variables from the outer function's scope.
+
+function outer() {
+  let count = 0;
+
+  function inner() {
+    count++;
+    console.log(count);
+  }
+
+  return inner;
+}
+
 
 // Basic Example
 function outer() {
@@ -107,3 +122,12 @@ fn1(); // 12
 
 // Interview Summary
 // A closure allows a function to access variables from its lexical scope even after the outer function has finished execution.
+
+
+// How clousues used in real time application
+// 1. Module Pattern: Closures are used to create private variables and methods in JavaScript modules.
+// 2. Event Listeners: Closures are used in event listeners to maintain state between events.
+
+// In vuejs ?
+// In Vue.js, closures are often used in methods and computed properties to maintain state and access component data. 
+// For example, when defining a method that needs to access reactive data, the method can close over the component's data properties, allowing it to read and modify them even after the method has been called. This is particularly useful in scenarios like event handling or asynchronous operations where the method needs to retain access to the component's state.
