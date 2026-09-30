@@ -130,4 +130,5 @@ fn1(); // 12
 
 // In vuejs ?
 // In Vue.js, closures are often used in methods and computed properties to maintain state and access component data. 
-// For example, when defining a method that needs to access reactive data, the method can close over the component's data properties, allowing it to read and modify them even after the method has been called. This is particularly useful in scenarios like event handling or asynchronous operations where the method needs to retain access to the component's state.
+// For example, when defining a method that needs to access reactive data, the method can close over the component's data properties, 
+// allowing it to read and modify them even after the method has been called. This is particularly useful in scenarios like event handling or asynchronous operations where the method needs to retain access to the component's state.

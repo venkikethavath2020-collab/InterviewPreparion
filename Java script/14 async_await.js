@@ -72,5 +72,8 @@ async function fetchUserDataNew() {
 
 }
 
+// Why res.json() is used in fetchUserDataNew function?
+// The `res.json()` method is used to parse the response from the fetch request into a JavaScript object. When you make a fetch request, the response is returned as a `Response` object, which contains various properties and methods. The `json()` method is one of those methods, and it reads the response stream and returns a promise that resolves with the result of parsing the body text as JSON.
+
 fetchUserDataNew()
 // fetchUserData()

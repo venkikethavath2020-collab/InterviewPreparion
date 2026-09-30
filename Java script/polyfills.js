@@ -1,3 +1,7 @@
+// What is polyfill?
+// A polyfill is a piece of code (usually JavaScript on the Web) used to provide modern functionality on older browsers that do not natively support it. 
+// Polyfills are a way to write code that works across different browsers and versions, ensuring that users have a consistent experience regardless of their browser choice.
+
 
 let name1 = {
     firstName: 'Venkatesh',

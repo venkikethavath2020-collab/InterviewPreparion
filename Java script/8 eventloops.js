@@ -73,3 +73,16 @@ Promise.resolve().then(() => {
 });
 
 console.log('End');
+
+
+// What is execution context and call stack in JavaScript?
+
+// Execution Context:
+// An execution context is an abstract concept that holds information about the environment in which the current code is being executed. 
+// It contains details such as variable scope, the value of 'this', and the order of function calls.
+
+// What is event bubling in JavaScript?
+// Event bubbling is a type of event propagation in the DOM where an event starts from the deepest target element and then bubbles up to its ancestors.
+
+// What is event capturing in JavaScript?
+// Event capturing is the opposite of event bubbling. In this phase, the event starts from the outermost ancestor and propagates down to the target element.

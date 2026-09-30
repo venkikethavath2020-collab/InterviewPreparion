@@ -2,6 +2,7 @@ const cart = ["mobiles", "shoes", "pants", "shirts"]
 
 
 
+
 const promisee = new Promise((resolve, reject) => {
     const success = true;
     if (success) {

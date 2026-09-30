@@ -1,7 +1,6 @@
 /*
 
-In JavaScript, call, apply, and bind are methods used to control the value of this within a function. 
-They allow you to invoke functions with a specified this context and arguments.
+In JavaScript, Call, apply, and bind are methods used to explicitly set the this value of a function. 
 
 call: 
     The call method calls a function with a given this value and arguments provided individually.
@@ -16,6 +15,11 @@ apply:
 bind: Creates a copy of a function that and invoked later
 
 */
+
+// What is the use of call, apply and bind methods in JavaScript and vue?
+// In JavaScript, call, apply, and bind methods are used to control the value of this within a function.
+// In Vue.js, these methods can be used to invoke methods with a specific context, allowing you to access component data and methods from different scopes.
+// Example: In Vue.js, you might use call or apply to invoke a method defined in one component from another component, passing the appropriate this context to access the component's data and methods.
 
 
 
